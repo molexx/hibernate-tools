@@ -213,6 +213,34 @@ public class JDBCBinder {
 			bindIncomingForeignKeys(rc, processed, incomingForeignKeys, mapping);
 			updatePrimaryKey(rc, pki);
 
+			//set DynamicInsert if an attribute 'dynamic-insert' has been set, and optionally only if a column has a DEFAULT set
+			MetaAttribute dynamicInsertMetaAttribute = rc.getMetaAttribute("dynamic-insert");
+			if (dynamicInsertMetaAttribute != null) {
+				String attributeValue = dynamicInsertMetaAttribute.getValue();
+				if ("ALWAYS".equalsIgnoreCase(attributeValue)) {
+					rc.setDynamicInsert(true);
+				} else if ("ANY_COLUMN_HAS_DEFAULT".equalsIgnoreCase(attributeValue)) {
+					boolean defaultedColumnFound = false;
+					for (Iterator<?> iterator = table.getColumnIterator(); iterator.hasNext();) {
+						Column column = (Column) iterator.next();
+						if (column.getDefaultValue() != null) {
+							defaultedColumnFound = true;
+							break;
+						}
+					}
+					if (defaultedColumnFound) {
+						rc.setDynamicInsert(true);
+						System.out.println("createPersistentClasses(): table '" + table.getName() + "' has metaAttribute 'dynamic-insert' of 'ANY_COLUMN_HAS_DEFAULT' and there at least one column with a default, setting dynamicInsert.");
+					} else {
+						System.out.println("createPersistentClasses(): table '" + table.getName() + "' has metaAttribute 'dynamic-insert' of 'ANY_COLUMN_HAS_DEFAULT' but there is no column with a default.");
+					}
+				} else {
+					String msg = "createPersistentClasses(): table '" + table.getName() + "' has metaAttribute 'dynamic-insert' with unexpected value '" + attributeValue + "'";
+					System.out.println(msg);
+					new Throwable(msg).printStackTrace();
+				}
+			}
+
 		}
 
 	}
