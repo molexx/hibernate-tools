@@ -3,6 +3,9 @@
 @${pojo.importType("javax.persistence.Embeddable")}
 <#else>
 @${pojo.importType("javax.persistence.Entity")}
+<#if clazz.useDynamicInsert()>
+@${pojo.importType("org.hibernate.annotations.DynamicInsert")}
+</#if>
 @${pojo.importType("javax.persistence.Table")}(name="${clazz.table.name}"
 <#if clazz.table.schema?exists>
     ,schema="${clazz.table.schema}"
