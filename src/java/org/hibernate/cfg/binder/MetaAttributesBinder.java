@@ -27,7 +27,7 @@ public class MetaAttributesBinder {
 					table, 
 					defaultCatalog, 
 					defaultSchema, 
-					col.getName());
+					col);
 			if(map!=null) { 
 				property.setMetaAttributes(map);
 			}

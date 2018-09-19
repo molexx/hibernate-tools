@@ -3,6 +3,7 @@ package org.hibernate.cfg.reveng;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.mapping.Column;
 import org.hibernate.mapping.MetaAttribute;
 import org.hibernate.mapping.Table;
 
@@ -47,15 +48,15 @@ public class RevEngUtils {
 			Table table,
 			String defaultCatalog,
 			String defaultSchema,
-			String column) {
+			Column columnObj) {
 		Map<String,MetaAttribute> result = null;
 		TableIdentifier tableIdentifier = TableIdentifier.create(table);
-		result = revengStrat.columnToMetaAttributes(tableIdentifier, column);
+		result = revengStrat.columnToMetaAttributes(tableIdentifier, columnObj);
 		if (result == null) {
 			String catalog = getCatalogForModel(table.getCatalog(), defaultCatalog);
 			String schema = getSchemaForModel(table.getSchema(), defaultSchema);
 			tableIdentifier = new TableIdentifier(catalog, schema, table.getName());
-			result = revengStrat.columnToMetaAttributes(tableIdentifier, column);
+			result = revengStrat.columnToMetaAttributes(tableIdentifier, columnObj);
 		}
 		return result;
 	}
