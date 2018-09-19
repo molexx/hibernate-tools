@@ -111,6 +111,7 @@ public class JDBCMetaDataDialect extends AbstractMetaDataDialect {
 					element.put("COLUMN_SIZE", new Integer(rs.getInt("COLUMN_SIZE")));
 					element.put("DECIMAL_DIGITS", new Integer(rs.getInt("DECIMAL_DIGITS")));
 					element.put("REMARKS", rs.getString("REMARKS"));
+					element.put("COLUMN_DEF", rs.getString("COLUMN_DEF"));
 					return element;					
 				}
 				protected Throwable handleSQLException(SQLException e) {

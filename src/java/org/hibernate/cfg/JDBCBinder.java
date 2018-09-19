@@ -831,14 +831,21 @@ public class JDBCBinder {
 
 	private Property bindBasicProperty(String propertyName, Table table, Column column, Set<Column> processedColumns, Mapping mapping) {
 		SimpleValue value = bindColumnToSimpleValue( table, column, mapping, false );
+		
+		boolean mutable = true;
+		if (column.getDefaultValue() != null) {
+			mutable = false;
+			System.out.println("bindBasicProperty(): making " + table.getName() + "." + column.getName() + " immutable");
+		}
+		
 		return PropertyBinder.makeProperty(
 				table, 
 				defaultCatalog,
 				defaultSchema,
 				propertyName, 
 				value, 
-				true, 
-				true, 
+				mutable, 
+				mutable, 
 				false, 
 				null, 
 				null,

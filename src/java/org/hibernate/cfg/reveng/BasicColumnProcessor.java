@@ -52,7 +52,7 @@ public class BasicColumnProcessor {
 					continue;
 				}
 				
-				//String columnDefaultValue = columnRs.getString("COLUMN_DEF"); TODO: only read if have a way to avoid issues with clobs/lobs and similar
+				String columnDefaultValue = (String) columnRs.get("COLUMN_DEF"); //TODO: only read if have a way to avoid issues with clobs/lobs and similar
 				int dbNullability = ((Integer)columnRs.get("NULLABLE")).intValue();
 				boolean isNullable = true;
 				switch (dbNullability) {
@@ -99,6 +99,7 @@ public class BasicColumnProcessor {
 				column.setNullable(isNullable);
 
 				// columnDefaultValue is useless for Hibernate
+				column.setDefaultValue(columnDefaultValue);
 				// isIndexed  (available via Indexes)
 				// unique - detected when getting indexes
 				// isPk - detected when finding primary keys				
