@@ -12,15 +12,21 @@ public class TableIdentifier {
 	private final String catalog;
 	private final String schema;
 	private final String name;
+	private final String comment;
 	
 	public TableIdentifier(String name) {
-		this(null,null,name);
+		this(null,null,name, null);
 	}
 	
 	public TableIdentifier(String catalog, String schema, String name) {
+		this(catalog, schema, name, null);
+	}
+	
+	public TableIdentifier(String catalog, String schema, String name, String comment) {
 		this.catalog = (catalog==null?null:catalog.intern() );
 		this.schema = (schema==null?null:schema.intern() );
-		this.name = (name==null?null:name.intern() );		
+		this.name = (name==null?null:name.intern() );
+		this.comment = (comment==null?null:comment.intern() );
 	}
 	
 	public String getCatalog() {
@@ -32,7 +38,10 @@ public class TableIdentifier {
 	public String getSchema() {
 		return schema;
 	}
-	
+	public String getComment() {
+		return comment;
+	}
+    
 	public boolean equals(Object obj) {
 		return obj instanceof TableIdentifier && equals( (TableIdentifier)obj);
 	}
@@ -66,7 +75,7 @@ public class TableIdentifier {
 	}
 	
 	public static TableIdentifier create(Table table) {
-		return new TableIdentifier(table.getCatalog(), table.getSchema(), table.getName() );
+		return new TableIdentifier(table.getCatalog(), table.getSchema(), table.getName(), table.getComment() );
 	}
 	
 	public String toString() {
