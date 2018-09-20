@@ -8,12 +8,14 @@ import org.hibernate.cfg.reveng.dialect.JDBCMetaDataDialect;
 import org.hibernate.cfg.reveng.dialect.MetaDataDialect;
 import org.hibernate.cfg.reveng.dialect.MySQLMetaDataDialect;
 import org.hibernate.cfg.reveng.dialect.OracleMetaDataDialect;
+import org.hibernate.cfg.reveng.dialect.PostgresMetaDataDialect;
 import org.hibernate.cfg.reveng.dialect.SQLServerMetaDataDialect;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.H2Dialect;
 import org.hibernate.dialect.HSQLDialect;
 import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.dialect.Oracle8iDialect;
+import org.hibernate.dialect.PostgreSQL81Dialect;
 import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.internal.util.ReflectHelper;
 
@@ -63,6 +65,8 @@ public class MetaDataDialectFactory {
 				return new HSQLMetaDataDialect();
 			}else if (dialect instanceof SQLServerDialect) {
 				return new SQLServerMetaDataDialect();
+			} else if (dialect instanceof PostgreSQL81Dialect) {
+				return new PostgresMetaDataDialect();
 			}			
 		}
 		return null;
@@ -83,6 +87,9 @@ public class MetaDataDialectFactory {
 		}
 		if (dialect.toLowerCase().contains("sqlserver")) {
 			return new SQLServerMetaDataDialect();
+		}
+		if (dialect.toLowerCase().contains("postgres")) {
+			return new PostgresMetaDataDialect();
 		}
 		return null;
 	}
