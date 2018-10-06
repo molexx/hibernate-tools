@@ -215,11 +215,33 @@ public class JDBCBinder {
 
 			//set DynamicInsert if an attribute 'dynamic-insert' has been set, and optionally only if a column has a DEFAULT set
 			MetaAttribute dynamicInsertMetaAttribute = rc.getMetaAttribute("dynamic-insert");
-			if (dynamicInsertMetaAttribute != null) {
-				String attributeValue = dynamicInsertMetaAttribute.getValue();
-				if ("ALWAYS".equalsIgnoreCase(attributeValue)) {
+			MetaAttribute dynamicUpdateMetaAttribute = rc.getMetaAttribute("dynamic-update");
+			if (dynamicInsertMetaAttribute != null || dynamicUpdateMetaAttribute != null) {
+				String insertMode = null;
+				String updateMode = null;
+
+				if (dynamicInsertMetaAttribute != null) {
+					insertMode = dynamicInsertMetaAttribute.getValue();
+					System.out.println("createPersistentClasses(): meta-attribute 'dynamic-insert' is set: " + insertMode);
+				}
+				
+				if (dynamicUpdateMetaAttribute != null) {
+					updateMode = dynamicUpdateMetaAttribute.getValue();
+					System.out.println("createPersistentClasses(): meta-attribute 'dynamic-update' is set: " + updateMode);
+				}
+				
+				
+				if ("ALWAYS".equalsIgnoreCase(insertMode)) {
 					rc.setDynamicInsert(true);
-				} else if ("ANY_COLUMN_HAS_DEFAULT".equalsIgnoreCase(attributeValue)) {
+				}
+				
+				if ("ALWAYS".equalsIgnoreCase(updateMode)) {
+					rc.setDynamicUpdate(true);
+				}
+				
+				if ("ANY_COLUMN_HAS_DEFAULT".equalsIgnoreCase(insertMode) || "ANY_COLUMN_HAS_DEFAULT".equalsIgnoreCase(updateMode)) {
+					//at least one is set to ANY_COLUMN_HAS_DEFAULT
+					//see if any of the table's columns has a DEFAULT set
 					boolean defaultedColumnFound = false;
 					for (Iterator<?> iterator = table.getColumnIterator(); iterator.hasNext();) {
 						Column column = (Column) iterator.next();
@@ -229,16 +251,21 @@ public class JDBCBinder {
 						}
 					}
 					if (defaultedColumnFound) {
-						rc.setDynamicInsert(true);
-						System.out.println("createPersistentClasses(): table '" + table.getName() + "' has metaAttribute 'dynamic-insert' of 'ANY_COLUMN_HAS_DEFAULT' and there at least one column with a default, setting dynamicInsert.");
+						if ("ANY_COLUMN_HAS_DEFAULT".equalsIgnoreCase(insertMode)) {
+							rc.setDynamicInsert(true);
+							System.out.println("createPersistentClasses(): table '" + table.getName() + "' has metaAttribute 'dynamic-insert' of 'ANY_COLUMN_HAS_DEFAULT' and there at least one column with a default, setting dynamicInsert.");
+						}
+						if ("ANY_COLUMN_HAS_DEFAULT".equalsIgnoreCase(updateMode)) {
+							rc.setDynamicUpdate(true);
+							System.out.println("createPersistentClasses(): table '" + table.getName() + "' has metaAttribute 'dynamic-update' of 'ANY_COLUMN_HAS_DEFAULT' and there at least one column with a default, setting dynamicUpdate.");
+						}
+						
 					} else {
-						System.out.println("createPersistentClasses(): table '" + table.getName() + "' has metaAttribute 'dynamic-insert' of 'ANY_COLUMN_HAS_DEFAULT' but there is no column with a default.");
+						System.out.println("createPersistentClasses(): table '" + table.getName() + "' has metaAttribute 'dynamic-insert' of '" + insertMode + "' and 'dynamic-update' of '" + updateMode + "' but there is no column with a default.");
 					}
-				} else {
-					String msg = "createPersistentClasses(): table '" + table.getName() + "' has metaAttribute 'dynamic-insert' with unexpected value '" + attributeValue + "'";
-					System.out.println(msg);
-					new Throwable(msg).printStackTrace();
 				}
+			} else {
+				System.out.println("createPersistentClasses(): meta-attributes 'dynamic-insert' and 'dynamic-update' not set.");
 			}
 
 		}

@@ -6,6 +6,9 @@
 <#if clazz.useDynamicInsert()>
 @${pojo.importType("org.hibernate.annotations.DynamicInsert")}
 </#if>
+<#if clazz.useDynamicUpdate()>
+@${pojo.importType("org.hibernate.annotations.DynamicUpdate")}
+</#if>
 @${pojo.importType("javax.persistence.Table")}(name="${clazz.table.name}"
 <#if clazz.table.schema?exists>
     ,schema="${clazz.table.schema}"
