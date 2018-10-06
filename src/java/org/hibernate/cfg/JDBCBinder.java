@@ -832,10 +832,27 @@ public class JDBCBinder {
 	private Property bindBasicProperty(String propertyName, Table table, Column column, Set<Column> processedColumns, Mapping mapping) {
 		SimpleValue value = bindColumnToSimpleValue( table, column, mapping, false );
 		
-		boolean mutable = true;
+		RootClass rc = new RootClass(mdbc);
+		
+		MetaAttribute insertDefaultsMetaAttribute = rc.getMetaAttribute("disallow-insert-defaults");
+		MetaAttribute updateDefaultsMetaAttribute = rc.getMetaAttribute("disallow-update-defaults");
+		
+		boolean insertable = true;
+		boolean updatable = true;
 		if (column.getDefaultValue() != null) {
-			mutable = false;
-			System.out.println("bindBasicProperty(): making " + table.getName() + "." + column.getName() + " immutable");
+			if (insertDefaultsMetaAttribute != null) {
+				String attributeValue = insertDefaultsMetaAttribute.getValue();
+				if ("true".equalsIgnoreCase(attributeValue)) {
+					insertable = false;
+				}
+			}
+			if (updateDefaultsMetaAttribute != null) {
+				String attributeValue = updateDefaultsMetaAttribute.getValue();
+				if ("true".equalsIgnoreCase(attributeValue)) {
+					updatable = false;
+				}
+			}
+			System.out.println("bindBasicProperty(): " + table.getName() + "." + column.getName() + " has a default value, making it insertable: " + insertable + ", updatable: " + updatable);
 		}
 		
 		return PropertyBinder.makeProperty(
@@ -844,8 +861,8 @@ public class JDBCBinder {
 				defaultSchema,
 				propertyName, 
 				value, 
-				mutable, 
-				mutable, 
+				insertable, 
+				updatable, 
 				false, 
 				null, 
 				null,
